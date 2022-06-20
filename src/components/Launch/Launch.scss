@@ -1,0 +1,104 @@
+.lanuch {
+  background: url("~@/assets/ico/svg/repeat-l.svg") top left repeat-y,
+  url("~@/assets/ico/svg/repeat-r.svg") top right repeat-y;
+  height: 100%;
+  overflow: auto;
+  background-size: rem(360px), rem(360px);
+
+  &__form {
+    color: $blue-400;
+    width: rem(896px);
+    margin: auto;
+
+    padding-top: rem(46px);
+    padding-bottom: rem(46px);
+  }
+
+
+  h2, h3 {
+    color: inherit;
+  }
+
+  h2 {
+    font-size: rem(36px);
+    line-height: rem(42px);
+    margin-bottom: rem(41px);
+  }
+
+  h3 {
+    font-size: rem(24px);
+    line-height: rem(28px);
+    margin-top: rem(41px);
+    margin-bottom: rem(27px);
+  }
+
+  .grid {
+    display: grid;
+    grid-gap: rem(30px);
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: rem(30px);
+
+    & .--last-item {
+      grid-column: span 2;
+    }
+  }
+
+  .group {
+    display: flex;
+    justify-content: space-between;
+
+    .input-block, .select-block {
+      width: calc(50% - #{rem(15px)});
+    }
+
+    .select-block {
+      height: 100%;
+      max-height: inherit;
+
+      &__button {
+
+      }
+
+      &__selected {
+        font-size: rem(18px);
+      }
+    }
+  }
+
+  .btn-group {
+    margin-top: rem(52px);
+
+    button {
+      margin-right: rem(30px);
+    }
+  }
+
+  .logo {
+    width: rem(93px);
+    height: rem(106px);
+
+    position: absolute;
+    right: rem(132px);
+    bottom: rem(126px);
+  }
+
+  .select-block {
+    .select-block__add {
+      color: $blue-700;
+
+      span {
+        font-size: rem(16px);
+        text-overflow: clip;
+        width: 121px;
+      }
+    }
+  }
+
+  &__user-data {
+    margin-top: rem(41px);
+
+    h3 {
+      margin-top: 0;
+    }
+  }
+}

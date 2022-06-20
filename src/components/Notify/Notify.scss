@@ -1,0 +1,143 @@
+.notify {
+  width: rem(93px);
+  height: rem(117px);
+
+
+  position: relative;
+  cursor: pointer;
+
+  &.active {
+    z-index: 20;
+  }
+
+  &:hover &__ico, &.active &__ico {
+    background-color: $white;
+
+    svg {
+      fill: $silver-1000;
+    }
+  }
+
+  &__ico {
+    width: 100%;
+    height: 100%;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    user-select: none;
+
+    &.active &-inner {
+      &:after {
+        opacity: 1;
+      }
+    }
+
+    svg {
+      width: rem(28px);
+      height: rem(35px);
+      fill: $silver-800;
+      display: block;
+      transition: .2s;
+    }
+
+    &-inner {
+      position: relative;
+      &:after {
+        content: "";
+        width: rem(10px);
+        height: rem(10px);
+        background: $red-light-gradient;
+        position: absolute;
+        display: block;
+        top: 0;
+        right: 0;
+        opacity: 0;
+        transition: .2s;
+        border-radius: 100%;
+      }
+    }
+  }
+
+  &.active ul {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: rem(360px);
+    height: rem(304px);
+
+    overflow: auto;
+    padding-left: rem(32px);
+    padding-right: rem(28px);
+
+    background-color: #fff;
+
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+
+    box-shadow: 0 rem(1px) rem(20px) rgba(0, 0, 0, 0.05);
+
+    li {
+      padding-top: rem(23px);
+      padding-bottom: rem(21px);
+      border-bottom: 1px solid $silver-300;
+      padding-left: rem(27px);
+      display: flex;
+      position: relative;
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      &.active {
+        &:after {
+          opacity: 1;
+        }
+      }
+
+      &:after {
+        content: "";
+        width: rem(10px);
+        height: rem(10px);
+        background: $red-light-gradient;
+        border-radius: 100%;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        opacity: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      time, span {
+        font-size: rem(14px);
+        line-height: 1.2;
+      }
+
+      time {
+
+      }
+
+      span {
+        display: inline-block;
+        padding-left: rem(23px);
+      }
+    }
+  }
+}

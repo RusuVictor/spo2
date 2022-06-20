@@ -1,0 +1,29 @@
+<svg width="360" height="1080" viewBox="0 0 360 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 1080H120L0 960V1080Z" fill="#F1F1F1"/>
+<path d="M0 720H120L0 600V720Z" fill="#F1F1F1"/>
+<path d="M0 360H120L0 240V360Z" fill="#F1F1F1"/>
+<path d="M240 1080H360L240 960V1080Z" fill="#F1F1F1"/>
+<path d="M240 720H360L240 600V720Z" fill="#F1F1F1"/>
+<path d="M240 360H360L240 240V360Z" fill="#F1F1F1"/>
+<path d="M120 1080H240L120 960V1080Z" fill="#F1F1F1"/>
+<path d="M120 720H240L120 600V720Z" fill="#F1F1F1"/>
+<path d="M120 360H240L120 240V360Z" fill="#F1F1F1"/>
+<path d="M0 960H120L0 840V960Z" fill="#F1F1F1"/>
+<path d="M0 600H120L0 480V600Z" fill="#F1F1F1"/>
+<path d="M0 240H120L0 120V240Z" fill="#F1F1F1"/>
+<path d="M240 960H360L240 840V960Z" fill="#F1F1F1"/>
+<path d="M240 600H360L240 480V600Z" fill="#F1F1F1"/>
+<path d="M240 240H360L240 120V240Z" fill="#F1F1F1"/>
+<path d="M120 960H240L120 840V960Z" fill="#F1F1F1"/>
+<path d="M120 600H240L120 480V600Z" fill="#F1F1F1"/>
+<path d="M120 240H240L120 120V240Z" fill="#F1F1F1"/>
+<path d="M0 840H120L0 720V840Z" fill="#F1F1F1"/>
+<path d="M0 480H120L0 360V480Z" fill="#F1F1F1"/>
+<path d="M0 120H120L0 0V120Z" fill="#F1F1F1"/>
+<path d="M240 840H360L240 720V840Z" fill="#F1F1F1"/>
+<path d="M240 480H360L240 360V480Z" fill="#F1F1F1"/>
+<path d="M240 120H360L240 0V120Z" fill="#F1F1F1"/>
+<path d="M120 840H240L120 720V840Z" fill="#F1F1F1"/>
+<path d="M120 480H240L120 360V480Z" fill="#F1F1F1"/>
+<path d="M120 120H240L120 0V120Z" fill="#F1F1F1"/>
+</svg>

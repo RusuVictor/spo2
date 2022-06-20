@@ -1,0 +1,1577 @@
+---
+swagger: "2.0"
+info:
+  description: "Полное описание REST API для управления всеми элементами системы у\
+    правления судебными делами и заседаниями"
+  version: "1.1.0"
+  title: "Dialog REST API"
+  contact:
+    email: "test@pm.me"
+host: "109.106.244.198"
+basePath: "/api"
+tags:
+  - name: "cases"
+    description: "Управление судебными делами"
+  - name: "hearings"
+    description: "Управление судебными заседаниями"
+  - name: "member roles"
+    description: "Управление ролями участников судебных заседаний"
+  - name: "hearing members"
+    description: "Управление участниками судебных заседаний"
+  - name: "events"
+    description: "Управление типами событий судебных заседаний"
+  - name: "hearing events"
+    description: "Управление событиями судебных заседаний"
+  - name: "rooms"
+    description: "Управление помещениями для проведения судебных заседаний"
+  - name: "contacts"
+    description: "Управление списком контактов"
+  - name: "protocols"
+    description: "Управление протоколами судебных заседаний"
+  - name: "users"
+    description: "Управление пользователями системы Dialog"
+  - name: "player"
+    description: "Управление воспроизведением и записью судебных заседаний"
+  - name: "calls"
+    description: "Управление видеозвонками звонками"
+  - name: "notifications"
+    description: "Управление списком уведомлений"
+
+schemes:
+  - "http"
+paths:
+  /case:
+    get:
+      tags:
+        - "cases"
+      summary: "Поиск судебного дела по номеру"
+      description: ""
+      operationId: "getCaseByNumber"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "number"
+          in: "query"
+          description: "Номер судебного дела"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                description: "Response body"
+                properties:
+                  case:
+                    $ref: "#/definitions/Case"
+              error:
+                type: "string"
+                description: "Null string"
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /cases:
+    get:
+      tags:
+        - "cases"
+      summary: "Поиск судебных дел по фильтру"
+      description: "Позволяет получить список судебных дел по номеру дела, типу производства и участию конкретного судьи или секретаря.
+      Нужно указать как минимум один параметр фильтра"
+      operationId: "findCases"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "number"
+          in: "query"
+          description: "Номер судебного дела"
+          required: false
+          type: "string"
+          x-exportParamName: "Number"
+          x-optionalDataType: "String"
+        - name: "type"
+          in: "query"
+          description: "Вид производства"
+          required: false
+          type: "string"
+          x-exportParamName: "Type_"
+          x-optionalDataType: "String"
+        - name: "judge"
+          in: "query"
+          description: "ID судьи"
+          required: false
+          type: "string"
+          x-exportParamName: "Judge"
+          x-optionalDataType: "String"
+        - name: "secretary"
+          in: "query"
+          description: "ID секретаря"
+          required: false
+          type: "string"
+          x-exportParamName: "Secretary"
+          x-optionalDataType: "String"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  cases:
+                    type: "array"
+                    items:
+                      $ref: "#/definitions/Case"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /hearing:
+    post:
+      tags:
+        - "hearings"
+      summary: "Создание судебного заседания"
+      description: "Создает новое судебное заседание с привязкой к указанному судеб\
+        ному делу. Если судебного дела с указанным номером еще нет, то оно будет с\
+        оздано автоматически, вместе с первым заседанием"
+      operationId: "addHearing"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Параметры заседания, необходимые для успешного добавления нового заседания"
+          required: true
+          schema:
+            $ref: "#/definitions/Hearing"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    description: "id of new hearing"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "409":
+          description: "Object already exists"
+          schema:
+            $ref: "#/definitions/Error409"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    get:
+      tags:
+        - "hearings"
+      summary: "Поиск судебного заседания по ID"
+      description: "Вернет полную информацию по судебному заседанию"
+      operationId: "getHearingByID"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "ID судебного заседания"
+          required: true
+          type: "string"
+          x-exportParamName: "HearingID"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  hearing:
+                    $ref: "#/definitions/Hearing"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    put:
+      tags:
+        - "hearings"
+      summary: "Обновление информации судебного заседания"
+      description: ""
+      operationId: "updateHearing"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "ID судебного заседания"
+          required: true
+          type: "string"
+          x-exportParamName: "HearingID"
+        - in: "body"
+          name: "body"
+          description: "Параметры заседания, который необходимо обновить"
+          required: true
+          schema:
+            $ref: "#/definitions/Hearing"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  hearing:
+                    $ref: "#/definitions/Hearing"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    delete:
+      tags:
+        - "hearings"
+      summary: "Удаление судебного заседания"
+      description: "Позволяет удалить судебное заседание до его начала"
+      operationId: "deleteHearing"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "ID заседания, которое необходимо удалить"
+          required: true
+          type: "string"
+          x-exportParamName: "HearingID"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    description: "id of deleted hearing"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /hearings:
+    get:
+      tags:
+        - "hearings"
+      summary: "Поиск судебных заседаний по дате, номеру помещения или номеру дела"
+      description: "Позволяет получить список судебных заседаний на выбранную дату\
+        \ в указанном помещении или по номеру судебного дела."
+      operationId: "findHearingsByDate"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "date"
+          in: "query"
+          description: "Дата проведения заседаний в формате 2021-12-30"
+          required: true
+          type: "string"
+          format: "date-time"
+          x-exportParamName: "Date"
+        - name: "room"
+          in: "query"
+          description: "Помещение проведения заседаний"
+          required: true
+          type: "string"
+          x-exportParamName: "Room"
+        - name: "case"
+          in: "query"
+          description: "Номер судебного дела"
+          required: true
+          type: "string"
+          x-exportParamName: "CaseNumber"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  hearings:
+                    type: "array"
+                    items:
+                      $ref: "#/definitions/Hearing"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /member/roles:
+    get:
+      tags:
+        - "member roles"
+      summary: "Получение всех доступный ролей участников заседания"
+      description: ""
+      operationId: "getMemberRoles"
+      produces:
+        - "application/json"
+      parameters: [ ]
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  roles:
+                    type: "array"
+                    items:
+                      $ref: "#/definitions/MemberRole"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /member/role:
+    post:
+      tags:
+        - "member roles"
+      summary: "Добавление новой роли для судебного заседания"
+      description: ""
+      operationId: "addMemberRole"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Описание новой роли"
+          required: true
+          schema:
+            $ref: "#/definitions/MemberRole"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  role:
+                    $ref: "#/definitions/MemberRole"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "409":
+          description: "Object already exists"
+          schema:
+            $ref: "#/definitions/Error409"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    delete:
+      tags:
+        - "member roles"
+      summary: "Удаление роли по номеру"
+      description: ""
+      operationId: "deleteMemberRole"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "name"
+          in: "query"
+          description: "ID роли, которое необходимо удалить"
+          required: true
+          type: "string"
+          x-exportParamName: "RoleID"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /hearing/members:
+    get:
+      tags:
+        - "hearing members"
+      summary: "Получения списка участников судебного заседания"
+      description: ""
+      operationId: "getHearingMembers"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "hearing"
+          in: "query"
+          description: "ID заседания"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  roles:
+                    type: "array"
+                    items:
+                      $ref: "#/definitions/Member"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /hearing/member:
+    post:
+      tags:
+        - "hearing members"
+      summary: "Добавление нового участника судебного заседания"
+      description: ""
+      operationId: "addHearingMember"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "hearing"
+          in: "query"
+          description: "ID заседания"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Информация о новом участнике заседания"
+          required: true
+          schema:
+            $ref: "#/definitions/Member"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  member:
+                    $ref: "#/definitions/Member"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "409":
+          description: "Object already exists"
+          schema:
+            $ref: "#/definitions/Error409"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    put:
+      tags:
+        - "hearing members"
+      summary: "Обновление информации об участнике судебного заседания"
+      description: ""
+      operationId: "updateHearingMember"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "ID участника"
+          required: true
+          type: "string"
+          x-exportParamName: "memberID"
+        - in: "body"
+          name: "body"
+          description: "Информация об участнике заседания"
+          required: true
+          schema:
+            $ref: "#/definitions/Member"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  member:
+                    $ref: "#/definitions/Member"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    delete:
+      tags:
+        - "hearing members"
+      summary: "Удаление участника судебного заседания"
+      description: ""
+      operationId: "deleteHearingMember"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "ID участника"
+          required: true
+          type: "string"
+          x-exportParamName: "memberID"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /events:
+    get:
+      tags:
+        - "events"
+      summary: "Получение всех типов событий"
+      description: ""
+      operationId: "getEvents"
+      produces:
+        - "application/json"
+      parameters: [ ]
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  roles:
+                    type: "array"
+                    items:
+                      $ref: "#/definitions/Event"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /event:
+    post:
+      tags:
+        - "events"
+      summary: "Добавление нового события"
+      description: ""
+      operationId: "addEvent"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Описание нового события"
+          required: true
+          schema:
+            $ref: "#/definitions/Event"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  member:
+                    $ref: "#/definitions/Event"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "409":
+          description: "Object already exists"
+          schema:
+            $ref: "#/definitions/Error409"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    delete:
+      tags:
+        - "events"
+      summary: "Удаление события по имени"
+      description: ""
+      operationId: "deleteEvent"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "name"
+          in: "query"
+          description: "Имя события, которое необходимо удалить"
+          required: true
+          type: "string"
+          x-exportParamName: "EventName"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /hearing/events:
+    get:
+      tags:
+        - "hearing events"
+      summary: "Получения списка событий судебного заседания"
+      description: ""
+      operationId: "getHearingEvents"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "hearing"
+          in: "query"
+          description: "ID заседания, список событий которого нужно получить"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  roles:
+                    type: "array"
+                    items:
+                      $ref: "#/definitions/HearingEvent"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /hearing/event:
+    post:
+      tags:
+        - "hearing events"
+      summary: "Добавление нового события судебного заседания"
+      description: ""
+      operationId: "addHearingEvent"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "hearing"
+          in: "query"
+          description: "ID заседания, к которому нужно добавить новое событие"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Параметры события, которое необходимо добавить"
+          required: true
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/HearingEvent"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  member:
+                    $ref: "#/definitions/HearingEvent"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "409":
+          description: "Object already exists"
+          schema:
+            $ref: "#/definitions/Error409"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    put:
+      tags:
+        - "hearing events"
+      summary: "Обновление информации о событии судебного заседания"
+      description: ""
+      operationId: "updateHearingEvent"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "ID события"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Информация о событии"
+          required: true
+          schema:
+            $ref: "#/definitions/Member"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  member:
+                    $ref: "#/definitions/HearingEvent"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    delete:
+      tags:
+        - "hearing events"
+      summary: "Удаление участника судебного заседания"
+      description: ""
+      operationId: "deleteHearingEvent"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "ID события"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /rooms:
+    get:
+      tags:
+        - "rooms"
+      summary: "Получения списка всех помещений"
+      description: ""
+      operationId: "getRooms"
+      produces:
+        - "application/json"
+      parameters: [ ]
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  roles:
+                    type: "array"
+                    items:
+                      $ref: "#/definitions/Room"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /room:
+    post:
+      tags:
+        - "rooms"
+      summary: "Добавление нового помещения"
+      description: ""
+      operationId: "addRoom"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Параметры нового помещения"
+          required: true
+          schema:
+            $ref: "#/definitions/Room"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    delete:
+      tags:
+        - "rooms"
+      summary: "Удаление помещения по названию"
+      description: ""
+      operationId: "deleteRoom"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "name"
+          in: "query"
+          description: "Название помещения"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /contacts:
+    get:
+      tags:
+        - "contacts"
+      summary: "Получения списка всех контактов"
+      description: ""
+      operationId: "getContacts"
+      produces:
+        - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  roles:
+                    type: "array"
+                    items:
+                      $ref: "#/definitions/Contact"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+  /contact:
+    post:
+      tags:
+        - "contacts"
+      summary: "Добавление нового контакта"
+      description: ""
+      operationId: "addContact"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Параметры нового контакта"
+          required: true
+          schema:
+            $ref: "#/definitions/Contact"
+          x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  member:
+                    $ref: "#/definitions/Contact"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "409":
+          description: "Object already exists"
+          schema:
+            $ref: "#/definitions/Error409"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    put:
+      tags:
+        - "contacts"
+      summary: "Обновление информации о контакте"
+      description: ""
+      operationId: "updateContact"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "ID контакта"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Информация о контакте"
+          required: true
+          schema:
+            $ref: "#/definitions/Contact"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+                properties:
+                  member:
+                    $ref: "#/definitions/Contact"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+    delete:
+      tags:
+        - "contacts"
+      summary: "Удаление контакта"
+      description: ""
+      operationId: "deleteContact"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "ID контакта"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+            properties:
+              body:
+                type: "object"
+              error:
+                type: string
+        "400":
+          description: "Missing request arguments or wrong arguments values"
+          schema:
+            $ref: "#/definitions/Error400"
+        "404":
+          description: "Can't find object"
+          schema:
+            $ref: "#/definitions/Error404"
+        "500":
+          description: "Internal server error (db error in common cases)"
+          schema:
+            $ref: "#/definitions/Error500"
+
+securityDefinitions:
+  dialog_auth:
+    type: "oauth2"
+    authorizationUrl: "http://dev.dialog.ru/oauth/"
+    flow: "implicit"
+    scopes:
+      write:hearings: "modify pets in your account"
+      read:hearings: "read your pets"
+definitions:
+  Hearing:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "ID заседания (генерируется при создании на стороне сервера)"
+      caseNumber:
+        type: "string"
+        description: "Номер дела (обязательное поле)"
+      caseType:
+        type: "integer"
+        description: "Вид производства (обязательное поле)"
+        enum:
+          - "1 - Уголовное дело"
+          - "2 - Гражданское дело"
+          - "3 - Административное дело"
+          - "4 - Административное дело КАС"
+          - "5 - Уголовное дело апелляция"
+          - "6 - Гражданское дело апелляция"
+          - "7 - Административное дело апелляция"
+      dateTime:
+        type: "string"
+        format: "date-time"
+        description: "Дата и время начала заседания в формате 2006-01-02T15:30:00+0300 (обязательное поле)"
+      room:
+        type: "string"
+        description: "Номер помещения (обязательное поле)"
+      status:
+        type: "string"
+        description: "Статус заседания. При создании выставляется статус waiting"
+        enum:
+          - "waiting"
+          - "inprogress"
+          - "finished"
+      plaintiffs:
+        type: "array"
+        description: "Истцы (обязательное поле). Нужно указать хотя бы одного истца."
+        items:
+          type: "string"
+      defendants:
+        type: "array"
+        description: "Ответчики (обязательное поле). Нужно указать хотя бы одного ответчика."
+        items:
+          type: "string"
+      lawyers:
+        type: "array"
+        description: "Адвокаты"
+        items:
+          type: "string"
+      prosecutors:
+        type: "array"
+        description: "Прокуроры"
+        items:
+          type: "string"
+      secretaryID:
+        type: "string"
+        description: "ID секретаря (обязательное поле)"
+      judgeID:
+        type: "string"
+        description: "ID судьи (обязательное поле)"
+    xml:
+      name: "Hearing"
+    example:
+      dateTime: "2022-02-23T12:15:00.000+0300"
+      defendants:
+        - "defendant_1"
+        - "defendant_2"
+      lawyers:
+        - "lawyer_1"
+        - "lawyer_2"
+      secretaryID: "secretaryID"
+      caseNumber: "caseNumber"
+      id: "id"
+      plaintiffs:
+        - "plaintiff_1"
+        - "plaintiff_2"
+      room: "room_1"
+      caseType: "placed"
+      status: "waiting"
+      prosecutors:
+        - "prosecutor_1"
+        - "prosecutor_2"
+      judgeID: "judgeID"
+  Case:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Id судебного дела"
+      number:
+        type: "string"
+        description: "Номер дела"
+      type:
+        type: "integer"
+        description: "Вид производства"
+        enum:
+          - "1 - Уголовное дело"
+          - "2 - Гражданское дело"
+          - "3 - Административное дело"
+          - "4 - Административное дело КАС"
+          - "5 - Уголовное дело апелляция"
+          - "6 - Гражданское дело апелляция"
+          - "7 - Административное дело апелляция"
+      judge:
+        type: "string"
+        description: "Id судьи"
+      secretary:
+        type: "string"
+        description: "Id секретаря"
+    xml:
+      name: "Case"
+    example:
+      id: "07028d5d-82f3-4ddf-887f-857224427f8d"
+      number: "АИД-123"
+      type: 1
+      secretary: "secretary_id"
+      judge: "judge_id"
+  MemberRole:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+    xml:
+      name: "Member role"
+    example:
+      name: "witness"
+  Member:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      role:
+        type: "string"
+      is_present:
+        type: "boolean"
+    example:
+      id: "07028d5d-82f3-4ddf-887f-857224427f8d"
+      role: "witness"
+      name: "Незнайка"
+      is_present: true
+  HearingEvent:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      hearing:
+        type: "string"
+      event:
+        type: "string"
+      start:
+        type: "integer"
+      end:
+        type: "integer"
+      notes:
+        type: "string"
+    xml:
+      name: "Hearing event"
+    example:
+      id: "07028d5d-82f3-4ddf-887f-857224427f8d"
+      hearing: "df6abe05-67ec-494e-8a91-3fc169862b0b"
+      event: "Открытие заседания"
+      start: 1
+      end: 60
+      notes: "Довольно быстро провели открытие заседания"
+  Event:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+    example:
+      name: "Начало заседания"
+  Room:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+        enum:
+          - "cabinet"
+          - "hall"
+      name:
+        type: "string"
+    example:
+      type: "hall"
+      name: "154-23"
+  Contact:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      address:
+        type: "string"
+      name:
+        type: "string"
+    example:
+      id: "df6abe05-67ec-494e-8a91-3fc169862b0b"
+      address: "192.168.13.13"
+      name: "Contact in local network"
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      username:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      phone:
+        type: "string"
+      userStatus:
+        type: "integer"
+        format: "int32"
+        description: "User Status"
+    xml:
+      name: "User"
+    example:
+      firstName: "firstName"
+      lastName: "lastName"
+      password: "password"
+      userStatus: 6
+      phone: "phone"
+      id: 0
+      email: "email"
+      username: "username"
+  Error400:
+    type: "object"
+    properties:
+      body:
+        type: "object"
+        description: "Null object (empty response)"
+      error:
+        type: "string"
+        description: "Error description"
+    example:
+      body: null
+      error: "Query argument is empty"
+  Error404:
+    type: "object"
+    properties:
+      body:
+        type: "object"
+        description: "Null object (empty response)"
+      error:
+        type: "string"
+        description: "Error description"
+    example:
+      body: null
+      error: "Object not found"
+  Error409:
+    type: "object"
+    properties:
+      body:
+        type: "object"
+        description: "Null object (empty response)"
+      error:
+        type: "string"
+        description: "Error description"
+    example:
+      body: null
+      error: "Object already exists (duplicate)"
+  Error500:
+    type: "object"
+    properties:
+      body:
+        type: "object"
+        description: "Null object (empty response)"
+      error:
+        type: "string"
+        description: "Error description"
+    example:
+      body: null
+      error: "Database error"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

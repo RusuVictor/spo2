@@ -1,0 +1,43 @@
+:root {
+  --root-font-size: calc(1334vw / calc(16 * 100));
+}
+
+$white: #fff;
+$black: #000;
+
+$blue-100: #F4F6FC;
+$blue-200: #DCE0F7;
+$blue-300: #AFB3C9;
+$blue-400: #818090;
+$blue-500: #7A7E8E;
+$blue-600: #787B8B;
+$blue-700: #555867;
+$blue-800: #31313D;
+$blue-900: #525367;
+$blue-1000: #DBE0EF;
+
+$blue: #718DD6;
+
+$silver-100: #F6F6F6;
+$silver-200: #F7F7F7;
+$silver-300: #EEEEEE;
+$silver-400: #E1E1E1;
+$silver-500: #E2E2E2;
+$silver-600: #E3E3E3;
+$silver-700: #D7D7D7;
+$silver-800: #DADADA;
+$silver-900: #C4C4C4;
+$silver-1000: #9394A0;
+$silver-1100: #E6E6E6;
+$silver-1200: #C9C9C9;
+$silver-1300: #E5E5E5;
+
+$red-100: #FF8484;
+$red-200: #F86666;
+$red-300: #F34F4F;
+
+$green: #54B25D;
+
+$blue-dark-gradient: linear-gradient(180.42deg, #474658 0.33%, #5D5F76 99.61%);
+$green-light-gradient: linear-gradient(180deg, #78D59D 0%, #3CA566 61.98%);
+$red-light-gradient: linear-gradient(180deg, #FF8484 0%, #F34F4F 61.98%);;
